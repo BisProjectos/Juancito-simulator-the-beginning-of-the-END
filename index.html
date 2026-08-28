@@ -56,7 +56,9 @@
             position: absolute;
             bottom: 12px;
             right: 20px;
-            font-size: 1.2rem;
+            font-size: 1rem;
+            color: #ffff80;
+            display: none; /* Hidden until typing completes */
             animation: blink 0.8s infinite;
         }
 
@@ -70,9 +72,9 @@
 
     <div id="bg-container"></div>
 
-    <div id="dialogue-box" onclick="advanceDialogue()">
+    <div id="dialogue-box" onclick="handleAdvance()">
         <p id="dialogue-text"></p>
-        <div class="indicator">▼</div>
+        <div class="indicator" id="indicator">Click to continue ▼</div>
     </div>
 
     <script>
@@ -82,45 +84,89 @@
                 image: "Story_images/1.png"
             },
             {
-                text: "one day the IDFbots took over and took control of dagastan,",
+                text: "one day the Israel IDF bots took over and took control of dagastan,",
                 image: "Story_images/2.png"
             },
             {
                 text: "when the world needed rap god the most.",
-                image: "Story_images/2.png"
+                image: "Story_images/3.png"
             },
             {
-                text: "he dispersed.",
-                image: "Story_images/2.png"
+                text: "he disapeared.",
+                image: "Story_images/3.png"
             }
         ];
 
+        // Pre-load all scene images into memory immediately
+        storySteps.forEach(step => {
+            const img = new Image();
+            img.src = step.image;
+        });
+
         let currentIndex = 0;
+        let charIndex = 0;
+        let isTyping = false;
+        let typingTimeout = null;
+        const typingSpeed = 45; // Speed in milliseconds per letter
+
         const textElement = document.getElementById("dialogue-text");
         const bgElement = document.getElementById("bg-container");
+        const indicatorElement = document.getElementById("indicator");
 
         function renderStep() {
-            if (currentIndex < storySteps.length) {
-                textElement.textContent = storySteps[currentIndex].text;
-                bgElement.style.backgroundImage = `url('${storySteps[currentIndex].image}')`;
-            } else {
+            if (currentIndex >= storySteps.length) {
                 window.location.href = "game.html";
+                return;
+            }
+
+            // Set preloaded background image instantly
+            bgElement.style.backgroundImage = `url('${storySteps[currentIndex].image}')`;
+
+            // Reset text state and hide indicator
+            textElement.textContent = "";
+            indicatorElement.style.display = "none";
+            charIndex = 0;
+            isTyping = true;
+
+            typeLetter();
+        }
+
+        function typeLetter() {
+            const currentText = storySteps[currentIndex].text;
+
+            if (charIndex < currentText.length) {
+                textElement.textContent += currentText.charAt(charIndex);
+                charIndex++;
+                typingTimeout = setTimeout(typeLetter, typingSpeed);
+            } else {
+                // Typing complete: show "Click to continue" indicator
+                isTyping = false;
+                indicatorElement.style.display = "block";
             }
         }
 
-        function advanceDialogue() {
-            currentIndex++;
-            renderStep();
+        function handleAdvance() {
+            if (isTyping) {
+                // If clicked while typing, instantly finish printing the sentence
+                clearTimeout(typingTimeout);
+                textElement.textContent = storySteps[currentIndex].text;
+                isTyping = false;
+                indicatorElement.style.display = "block";
+            } else {
+                // If text is fully typed, move to the next slide
+                currentIndex++;
+                renderStep();
+            }
         }
 
-        // Allow keypress controls (Enter, Space, Z)
+        // Keyboard controls (Enter, Space, Z)
         document.addEventListener("keydown", (e) => {
             if (["Enter", " ", "z", "Z"].includes(e.key)) {
-                advanceDialogue();
+                handleAdvance();
             }
         });
 
-        // Initialize scene
+        // Start scene
         renderStep();
     </script>
 
