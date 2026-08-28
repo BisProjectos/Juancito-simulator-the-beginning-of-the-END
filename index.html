@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Intro</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Fullscreen background image */
+        #bg-container {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Undertale-style dialogue box at the bottom */
+        #dialogue-box {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            max-width: 800px;
+            height: 150px;
+            background-color: #000;
+            border: 5px solid #fff;
+            padding: 20px;
+            color: #fff;
+            font-size: 1.4rem;
+            line-height: 1.5;
+            z-index: 2;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Blinking advance indicator */
+        .indicator {
+            position: absolute;
+            bottom: 12px;
+            right: 20px;
+            font-size: 1.2rem;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-container"></div>
+
+    <div id="dialogue-box" onclick="advanceDialogue()">
+        <p id="dialogue-text"></p>
+        <div class="indicator">▼</div>
+    </div>
+
+    <script>
+        const storySteps = [
+            {
+                text: "Long ago the Rap God kept the world of dagastan in piece,",
+                image: "Story_images/1.png"
+            },
+            {
+                text: "one day the IDFbots took over and took control of dagastan,",
+                image: "Story_images/2.png"
+            },
+            {
+                text: "when the world needed rap god the most.",
+                image: "Story_images/2.png"
+            },
+            {
+                text: "he dispersed.",
+                image: "Story_images/2.png"
+            }
+        ];
+
+        let currentIndex = 0;
+        const textElement = document.getElementById("dialogue-text");
+        const bgElement = document.getElementById("bg-container");
+
+        function renderStep() {
+            if (currentIndex < storySteps.length) {
+                textElement.textContent = storySteps[currentIndex].text;
+                bgElement.style.backgroundImage = `url('${storySteps[currentIndex].image}')`;
+            } else {
+                window.location.href = "game.html";
+            }
+        }
+
+        function advanceDialogue() {
+            currentIndex++;
+            renderStep();
+        }
+
+        // Allow keypress controls (Enter, Space, Z)
+        document.addEventListener("keydown", (e) => {
+            if (["Enter", " ", "z", "Z"].includes(e.key)) {
+                advanceDialogue();
+            }
+        });
+
+        // Initialize scene
+        renderStep();
+    </script>
+
+</body>
+</html>
